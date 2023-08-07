@@ -122,7 +122,7 @@ data:
   LDAP_MIRROR_GROUPS: {{ include "boolean2str" .Values.geonode.ldap.mirror_groups | quote }}
   LDAP_GROUP_SEARCH_DN: {{ .Values.geonode.ldap.group_search_dn | quote }}
   LDAP_GROUP_SEARCH_FILTERSTR: {{ .Values.geonode.ldap.group_search_filterstr | quote }}
-  
+
   LDAP_USER_ATTR_MAP_FIRST_NAME: {{ .Values.geonode.ldap.attr_map_first_name | quote }}
   LDAP_USER_ATTR_MAP_LAST_NAME: {{ .Values.geonode.ldap.attr_map_last_name | quote }}
   LDAP_USER_ATTR_MAP_EMAIL_ADDR: {{ .Values.geonode.ldap.attr_map_email_addr | quote }}

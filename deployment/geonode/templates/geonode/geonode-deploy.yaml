@@ -58,6 +58,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
+          echo "FIXTURE_DIRS: [ "/usr/src/geonode/fixtures" ]" >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -126,6 +127,10 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        - name: additionallicenses.json
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          subPath: geonode-fixture-additionallicenses.json
+          readOnly: true
 
         resources:
           requests:
@@ -162,6 +167,7 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
+          echo "FIXTURE_DIRS: [ "/usr/src/geonode/fixtures" ]" >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -223,6 +229,11 @@ spec:
           mountPath: "/usr/src/geonode/geonode/geonode-k8s-settings.py"
           subPath: geonode-k8s-settings.py
           readOnly: true
+        - name: additionallicenses.json
+          mountPath: "/usr/src/geonode/geonode/fixtures"
+          subPath: geonode-fixture-additionallicenses.json
+          readOnly: true
+
         resources:
           requests:
             memory: {{ .Values.geonode.celery.resources.requests.memory }}
