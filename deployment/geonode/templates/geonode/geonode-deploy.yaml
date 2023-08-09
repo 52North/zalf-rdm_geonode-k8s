@@ -73,7 +73,6 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-          echo "FIXTURE_DIRS: [ "/usr/src/geonode/fixtures" ]" >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /usr/src/geonode/invoke.log
@@ -183,7 +182,6 @@ spec:
 
           # Add config overrides
           cat /usr/src/geonode/geonode/geonode-k8s-settings.py >> /usr/src/geonode/geonode/settings.py
-          echo "FIXTURE_DIRS: [ "/usr/src/geonode/fixtures" ]" >> /usr/src/geonode/geonode/settings.py
 
           # Setup
           touch /var/log/celery.log
