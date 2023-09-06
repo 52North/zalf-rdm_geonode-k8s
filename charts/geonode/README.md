@@ -1,15 +1,21 @@
-[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/geonode-k8s)](https://artifacthub.io/packages/search?repo=geonode-k8s)
 # geonode-k8s
 
 ![Version: 4.1.0](https://img.shields.io/badge/Version-4.1.0-informational?style=flat-square)
 
-Helm Chart for Geonode
+Helm Chart for Geonode a web-based application and platform for developing geospatial information systems (GIS) and for deploying spatial data infrastructures (SDI)
 
-**Homepage:** <https://github.com/zalf-rdm/geonode-k8s>
+**Homepage:** <https://geonode.org/>
+
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| mwallschlaeger | <marcel.wallschlaeger@zalf.de> |  |
 
 ## Source Code
 
 * <https://github.com/zalf-rdm/geonode-k8s>
+* <https://github.com/geonode/geonode>
 
 ## Requirements
 
@@ -42,6 +48,8 @@ Helm Chart for Geonode
 | geonode.general.display.rating | bool | `true` | DISPLAY_RATINGS If set to False ratings are hidden. |
 | geonode.general.display.social | bool | `true` | DISPLAY_SOCIAL If set to False social sharing is hidden. |
 | geonode.general.display.wms_link | bool | `true` | DISPLAY_WMS_LINKS If set to False direct WMS link to GeoServer is hidden. |
+| geonode.general.externalDomain | string | `"geonode"` | external ingress hostname  |
+| geonode.general.externalScheme | string | `"http"` | external ingress schema. If set to 'https', make sure to configure TLS either by  configuring tls certificate or using cert-manager. Available options: (http|https) |
 | geonode.general.freetext_keywords_readonly | bool | `false` | FREETEXT_KEYWORDS_READONLY Make Free-Text Keywords writable from users. Or read-only when set to False. |
 | geonode.general.max_document_size | int | `10` | max upload document size in MB |
 | geonode.general.ogc_request_backoff_factor | float | `0.3` | OGC_REQUEST_BACKOFF_FACTOR |
@@ -51,6 +59,7 @@ Helm Chart for Geonode
 | geonode.general.ogc_request_timeout | int | `600` | OGC_REQUEST_TIMEOUT |
 | geonode.general.publishing.admin_moderate_uploads | bool | `false` | ADMIN_MODERATE_UPLOADS When this variable is set to True, every uploaded resource must be approved before becoming visible to the public users. Until a resource is in PENDING APPROVAL state, only the superusers, owner and group members can access it, unless specific edit permissions have been set for other users or groups. A Group Manager can approve the resource, but he cannot publish it whenever the setting RESOURCE_PUBLISHING is set to True. Otherwise, if RESOURCE_PUBLISHING (helm: resource_publishing_by_staff) is set to False, the resource becomes accessible as soon as it is approved. |
 | geonode.general.publishing.resource_publishing_by_staff | bool | `false` | RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources. By default, resources are published when created. When this setting is set to True the staff members will be able to unpublish a resource (and eventually publish it back). |
+| geonode.general.secretName | string | `"demo-secret"` | the secret name containing confidential values  |
 | geonode.general.settings_module | string | `"geonode.settings"` | the settings module to load |
 | geonode.general.superUser.email | string | `"support@example.com"` | admin user password |
 | geonode.general.superUser.password | string | `"geonode"` | admin panel password |
@@ -63,10 +72,8 @@ Helm Chart for Geonode
 | geonode.image.tag | string | `"4.1.x"` | tag of used geonode image |
 | geonode.ingress.addNginxIngressAnnotation | bool | `false` | adds ingress annotations for nginx ingress class to increase uploadsize and timeout time |
 | geonode.ingress.enabled | bool | `true` | enables external access  |
-| geonode.ingress.externalDomain | string | `"geonode"` | external ingress hostname  |
-| geonode.ingress.externalScheme | string | `"http"` | external ingress schema. if set to https ingress tls is used. Loading tls certificate via tls-secret options Available options: (http|https) |
 | geonode.ingress.ingressClassName | string | `nil` | define kubernetes ingress class for geonode ingress |
-| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.ingress.externalScheme is set to https |
+| geonode.ingress.tlsSecret | string | `"geonode-tls-secret"` | tls certificate for geonode ingress https://kubernetes.io/docs/tasks/tls/managing-tls-in-a-cluster/ (for the use of cert-manager, configure the acme section properly). is used when geonode.general.externalScheme is set to 'https' |
 | geonode.ldap.always_update_user | bool | `true` | always update local user database from ldap |
 | geonode.ldap.attr_map_email_addr | string | `"mailPrimaryAddress"` | email attribute used from ldap  |
 | geonode.ldap.attr_map_first_name | string | `"givenName"` | given name attribute used from ldap |
@@ -187,9 +194,24 @@ Helm Chart for Geonode
 | postgres.operator_manifest.storageSize | string | `"3Gi"` | Database storage size |
 | postgres.schema | string | `"public"` | database schema |
 | postgres.username | string | `"postgres"` | postgres username |
+| pycsw.config | string | [server] ... | pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/ |
+| pycsw.container_name | string | `"pycsw"` | pycsw container name |
+| pycsw.enabled | bool | `true` | enable single pycsw pod |
+| pycsw.endpoint | string | `"/catalogue/csw"` | pycsw url below geonode.ingress.externalDomain |
+| pycsw.image.name | string | `"geopython/pycsw"` | pycsw docker image |
+| pycsw.image.tag | string | `"2.6.1"` | pycsw docker image tag |
+| pycsw.mappings | string | MD_CORE_MODEL = { ... } | pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py |
+| pycsw.pod_name | string | `"pysw"` | pycsw pod name |
+| pycsw.port | int | `8000` | pycsw endpoint port |
+| pycsw.replicaCount | int | `1` | pycsw container replicas |
+| pycsw.resources.limits.cpu | string | `"500m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pycsw.resources.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq | object | `{"auth":{"erlangCookie":"jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu","password":"rabbitpassword","username":"rabbituser"},"enabled":true,"limits":{"cpu":"750m","memory":"1Gi"},"persistence":{"enabled":false},"replicaCount":1,"requests":{"cpu":"500m","memory":"1Gi"}}` | VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml |
 | rabbitmq.limits.cpu | string | `"750m"` | limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.limits.memory | string | `"1Gi"` | limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| rabbitmq.replicaCount | int | `1` | rabbitmq raplica count |
 | rabbitmq.requests.cpu | string | `"500m"` | requested cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | rabbitmq.requests.memory | string | `"1Gi"` | requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 

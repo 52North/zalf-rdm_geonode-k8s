@@ -7,14 +7,14 @@ geonode:
   general:
     debug: True
     debug_static: True
+    externalScheme: http
+    externalDomain: geonode
 
   persistant:
     storageSize: 2Gi
 
   ingress:
     enabled: False
-    externalScheme: http
-    externalDomain: geonode
 
   superUser:
     password: geonode
@@ -29,6 +29,9 @@ geonode:
     open_signup: True
     email_verification: "False"
     authentication_method: username_email
+
+pycsw:
+  enabled: True
 
 postgres-operator-ui:
   enabled: False
