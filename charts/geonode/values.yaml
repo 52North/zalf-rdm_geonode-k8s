@@ -1,10 +1,10 @@
-
 global:
   # -- storageClass used by helm dependencies pvc
   storageClass:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
+  
 # geonode configuration
 geonode:
   # -- pod name
@@ -30,6 +30,18 @@ geonode:
   # -- additions to tasks.py script at the beginning of the tasks.py, must be additional code written in python
   tasks_post_script: |
     print("tasks_post_script not defined ...")
+
+  secret:
+    # -- name of the secret to use. Change, if you want to maintain them separately.
+    name: geonode-secret
+    # -- if Secret shall be created based on the values of `secret.content`.
+    createFromContent: True
+    # -- Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name).
+    content:
+      superuser:
+        username: admin
+        password: geonode
+        email: support@example.com
 
   resources:
     requests:
