@@ -4,7 +4,6 @@ global:
   # -- storage access mode used by helm dependency pvc
   accessMode: ReadWriteMany
 
-  
 # geonode configuration
 geonode:
   # -- pod name
@@ -20,9 +19,9 @@ geonode:
 
   image:
     # -- used geonode image
-    name: mwall2bitflow/geonode
+    name: 52north/geonode
     # -- tag of used geonode image
-    tag: '4.1.x'
+    tag: '4.1.2'
 
   # -- additions to tasks.py init script, must be additional code written in python
   tasks_pre_script: |
@@ -32,16 +31,26 @@ geonode:
     print("tasks_post_script not defined ...")
 
   secret:
-    # -- name of the secret to use. Change, if you want to maintain them separately.
-    name: geonode-secret
-    # -- if Secret shall be created based on the values of `secret.content`.
-    createFromContent: True
-    # -- Values of the Secret. If empty, the Secret will not be created from template. In this case, you have to either create the Secret on your own (you may choose a different name).
-    content:
-      superuser:
-        username: admin
-        password: geonode
-        email: support@example.com
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    superUser:
+      # -- admin username
+      username: admin
+      # -- admin panel password
+      password: geonode
+      # -- admin user password
+      email: support@example.com
+    mail:
+      # -- define mail user to send mails from
+      user: "changeme"
+      # -- set password for mailuser in geonode
+      password: "changeme"
+      # -- define from mail-addr 
+      from: "changeme@web.de"
+    ldap:
+      # -- ldap password
+      bind_password: password
+
 
   resources:
     requests:
@@ -84,7 +93,6 @@ geonode:
     # -- sentry build number
     build_number: 0
 
-  # -- geonode uwsgi configuration
   uwsgi:
     # --  the max size of a request (request-body excluded)
     buffer_size: 32768
@@ -121,8 +129,6 @@ geonode:
     cheaper_busyness_backlog_step: 2
 
   general:
-    # -- the secret name containing confidential values 
-    secretName: demo-secret
 
     # -- external ingress schema. If set to 'https', make sure to configure TLS either by 
     # configuring tls certificate or using cert-manager. Available options: (http|https)
@@ -153,14 +159,6 @@ geonode:
     ogc_request_pool_maxsize: 10
     # -- OGC_REQUEST_POOL_CONNECTIONS
     ogc_request_pool_connections: 10
-
-    superUser:
-      # -- admin username
-      username: admin
-      # -- admin panel password
-      password: geonode
-      # -- admin user password
-      email: support@example.com
 
     publishing:
       # -- RESOURCE_PUBLISHING By default, the GeoNode application allows GeoNode staff members to publish/unpublish resources.
@@ -198,12 +196,6 @@ geonode:
     tls: true
     # -- enable ssl for geonode mail (only tls or ssl can be true not both)
     use_ssl: False
-    # -- define mail user to send mails from
-    user: "changeme"
-    # -- set password for mailuser in geonode
-    password: "changeme"
-    # -- define from mail-addr 
-    from: "changeme@web.de"
 
   ldap:
     # -- enable ldap AUTHENTICATION_BACKENDS in DJANGO Geonode
@@ -212,8 +204,6 @@ geonode:
     uri: ldap://example.com
     # -- ldap user bind dn
     bind_dn: "CN=Users,DC=ad,DC=example,DC=com"
-    # -- ldap password
-    bind_password: password
     # -- ldap user search dn
     user_search_dn: "OU=User,DC=ad,DC=example,DC=com"
     # -- ldap user filterstr
@@ -239,6 +229,7 @@ geonode:
   # - https://docs.geonode.org/en/3.3.x/basic/settings/index.html 
   # - https://github.com/pinax/django-user-accounts/blob/master/docs/settings.rst
   # - https://django-allauth.readthedocs.io/en/latest/configuration.html
+  # @ignored
   register:
     # -- allow user registration on geonode
     # Default: True
@@ -259,14 +250,13 @@ geonode:
     # -- If True, new user accounts will be created as inactive. The user must use the activation link to activate his account.
     conformation_required: True
     # -- Specifies the login method to use – whether the user logs in by entering their username, e-mail address, or either one of both. Setting this to “email” requires email_required=True
-    authentication_method: "user_email"
+    authentication_method: "username_email"
     # -- group name to add new registered users to, requires auto_assign_registered_members_to_registered: True.
     registered_members_group_name:
     # -- if set to True new registered user will be add to defined group in registered_members_group_name
     auto_assign_registered_members_to_registered: True
     # -- show email addr in profile view
     show_profile_email: True
-
 
   # TODO add haystack chart
   haystack:
@@ -279,7 +269,6 @@ geonode:
     # -- hystack results per page
     search_results_per_page: '200'
 
-
   # configure memcached as django cache. .Values.memcached.... to configure memcached replicas, architecture and so on (see https://docs.djangoproject.com/en/4.0/topics/cache/)
   memcached:
     # -- enable memcache, this will spawn one or more seperate memcache container(s) and configure django geonode repsectivly. Dynamic caching (see https://docs.djangoproject.com/en/4.0/topics/cache/)
@@ -289,7 +278,7 @@ geonode:
     # -- memcached lock timeout
     lock_timeout: '10'
 
-
+  # TODO not tested yey
   monitoring:
     enabled: False
     data_tls: 365
@@ -298,6 +287,7 @@ geonode:
     centralized_dashboard_enabled: False
 
   celery:
+    # -- celery container name
     container_name: celery
     resources:
       requests:
@@ -307,11 +297,11 @@ geonode:
         cpu: 1
       limits:
         # -- limits memory as in resource.limits.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-        memory: "1Gi"
+        memory: "2Gi"
         # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-        cpu: 1
+        cpu: 2
 
-# -- CONFIGURATION FOR GEOSERVER DEPLOYMENT
+# CONFIGURATION FOR GEOSERVER DEPLOYMENT# 
 geoserver:
   # -- geoserver pod name
   pod_name: geoserver
@@ -324,12 +314,15 @@ geoserver:
     tag: '2.23.0'
   # -- geoserver port
   port: 8080
-  # -- geoserver admin username
-  admin_username: admin
-  # -- geoserver admin password
-  admin_password: "geoserver"
 
-  # -- geoserver kube resources
+  secret:
+    # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+    existingSecretName: ""
+    # -- geoserver admin username
+    admin_username: admin
+    # -- geoserver admin password
+    admin_password: "geoserver"
+
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -343,7 +336,6 @@ geoserver:
       cpu: 2
 
 # CONFIGURATION FOR NGINX DEPLOYMENT
-# MAY MOVE TO CHART
 nginx:
   # -- nginx pod name
   pod_name: nginx
@@ -358,7 +350,6 @@ nginx:
     tag: '1.25'
   # -- max file upload size
   maxClientBodySize: 2G
-
   resources:
     requests:
       # -- requested memory as in resource.requests.memory (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -401,8 +392,8 @@ pycsw:
       memory: "1Gi"
       # -- limit cpu as in resource.requests.cpu (https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
       cpu: "500m"
-  # -- pycsw local mappings, copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
-  # @default -- MD_CORE_MODEL = { ... }
+  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- copied from 4.1.x: https://github.com/GeoNode/geonode/blob/master/geonode/catalogue/backends/pycsw_local_mappings.py
   mappings: |-
     MD_CORE_MODEL = {
       "typename": "pycsw:CoreMetadata",
@@ -411,6 +402,7 @@ pycsw:
           "pycsw:Identifier": "uuid",
           "pycsw:Typename": "csw_typename",
           "pycsw:Schema": "csw_schema",
+
           "pycsw:MdSource": "csw_mdsource",
           "pycsw:InsertDate": "csw_insert_date",
           "pycsw:XML": "metadata_xml",
@@ -467,9 +459,9 @@ pycsw:
           "pycsw:Links": "download_links",
       },
     }
-  # -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
-  # @default -- [server] ...
-  config: |
+  # pycsw.config -- pycsw config file parameters, see docs: https://docs.pycsw.org/_/downloads/en/latest/pdf/
+  # @default -- based of pycsw example.cfg: https://github.com/geopython/pycsw/blob/master/docker/pycsw.cfg
+  config: |-
     [server]
         home=/home/pycsw
         url=$(PYCSW_SERVER_URL)
@@ -491,8 +483,8 @@ pycsw:
         timeout=30
     [manager]
         transactions=false
-        # allowed_ips={{ .Values.pycsw.config.manager.allowed_ips }}{{ end }}
-        # csw_harvest_pagesize={{ .Values.pycsw.config.manager.csw_harvest_pagesize }}{{ end }}
+        # allowed_ips=
+        # csw_harvest_pagesize=
     [metadata:main]
         identification_title=GeoNode pycsw Geospatial Catalogue
         identification_abstract=GeoNode-k8s pycsw Geospatial Catalogue
@@ -540,7 +532,7 @@ memcached:
   architecture: high-availability
   replicaCount: 1
 
-# -- VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
+# VALUES DEFINITION https://github.com/bitnami/charts/blob/master/bitnami/rabbitmq/values.yaml
 rabbitmq:
   enabled: true
   # -- rabbitmq raplica count
@@ -549,6 +541,8 @@ rabbitmq:
     username: rabbituser
     password: rabbitpassword
     erlangCookie: jixYBsiZ9RivaLXC02pTwGjvIo0nHtVu
+    existingPasswordSecret: ""
+    existingErlangSecret: ""
   persistence:
     enabled: False
 
@@ -573,7 +567,7 @@ postgres:
   # -- geoserver database name and username
   geodata_databasename_and_username: geodata
 
-  # -- configuration for postgres operator database manifest
+  # configuration for postgres operator database manifest
   operator_manifest:
     # -- pod name for postgres containers == teamID for mainifest
     pod_name: postgresql
@@ -591,9 +585,12 @@ postgres:
     enabled: False
     hostname: my-external-postgres.com
     port: 5432
-    postgres_password: postgres
-    geonode_password: geonode
-    geodata_password: geogeonode
+    secret:
+      # -- name of an existing Secret to use. Set, if you want to separately maintain the Secret.
+      existingSecretName: ""
+      postgres_password: postgres
+      geonode_password: geonode
+      geodata_password: geogeonode
 
 # VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator/values.yaml
 postgres-operator:
@@ -611,7 +608,7 @@ postgres-operator:
     name: ""
 
 
-# -- VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
+# VALUES DEFINITION: https://github.com/zalando/postgres-operator/blob/master/charts/postgres-operator-ui/values.yaml
 postgres-operator-ui:
   enabled: False
   replicaCount: 1

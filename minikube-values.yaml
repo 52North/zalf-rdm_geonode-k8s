@@ -16,8 +16,9 @@ geonode:
   ingress:
     enabled: False
 
-  superUser:
-    password: geonode
+  secret:
+    superUser:
+      password: geonode
 
   mail:
     enabled: False
@@ -31,7 +32,7 @@ geonode:
     authentication_method: username_email
 
 pycsw:
-  enabled: True
+  enabled: False
 
 postgres-operator-ui:
   enabled: False
